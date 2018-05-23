@@ -13,18 +13,8 @@ RE = 6378.137;          % [km]
 mu = 398600.4415;       % [km^3/s^2] (Montenbruck)
 J2 = 1.08263e-3;
 
-m1 = 500;       % [kg]
-m2 = 300;       % [kg]
-CD = 2.3;
-A1 = 20e-6;      % [km^2]
-A2 = 5e-6;      % [km^2]
-rho0 = 1.225e9; % [kg/km^3]
-h0 = 0;         % [km]
-H = 10;         % [km]
-B1 = CD*A1/m1; % Ballistic coef of spacecraft 1
-B2 = CD*A2/m2; % Ballistic coef of spacecraft 2
+%% Initial conditions of satellites
 
-%% Initial conditions of spacecraft
 % --------------- Spacecraft 1 -------------------
 % semi-major axis
 a1 = RE + 586; % [km]
@@ -48,16 +38,16 @@ a2 = a1; % [km]
 % eccentricity
 e2 = e1;
 % inclination 
-i2 = i1 + deg2rad(10); % [rad]
+i2 = deg2rad(63); % [rad]
 % Right ascension of the ascending node
-O2 = O1; % [rad]
+O2 = deg2rad(4); % [rad]
 % argument of perigee
-w2 = w1; % [rad]
+w2 = deg2rad(125); % [rad]
 % true anomaly
-f2 = deg2rad(2); % [rad]
+f2 = deg2rad(0); % [rad]
 
 % Convert to ECI position and velocity 
-[r0_2, v0_2] = oe2eci(a2, e2, i2, O2, w2, f2, mu);
+[r0_2, v0_2] = oe2eci(a1, e1, i1, O1, w1, f1, mu);
 
 %% Simulate using numerical integration
 
