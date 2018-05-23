@@ -60,8 +60,23 @@ f2 = deg2rad(2); % [rad]
 [r0_2, v0_2] = oe2eci(a2, e2, i2, O2, w2, f2, mu);
 
 %% Simulate using numerical integration
+dt = 5; % [s]
+tspan = 0:5:(86400*10); % Run for 10 days
+options = odeset('RelTol', 1e-6, 'AbsTol', 1e-9);
 
-
+% Simulate Spacecraft 1
+y_init1 = [r0_1, v0_1];
+[t_out, y_out1] = ode113(@(t,y) get_statedot(t, y, mu, rho0, h0, H, B1),...
+                    tspan, y_init1, options);
+            
+% Simulate Spacecraft 2
+y_init2 = [r0_1, v0_1];
+[~, y_out2] = ode113(@(t,y) get_statedot(t, y, mu, rho0, h0, H, B2), ...
+                tspan, y_init1, options);
+            
+% Extract simulation outputs
+% r1_eci =
+            
 %% Plot orbits
 figure
 grid on; hold on;
