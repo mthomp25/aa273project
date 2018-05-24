@@ -136,4 +136,5 @@ plot3(0,0,0, '*r')
 plot3(rho(2,:), rho(3,:), rho(1,:), 'LineWidth', 2)
 zlabel('\rho_R (m)'); xlabel('\rho_T (m)'); ylabel('\rho_N (m)');
 axis equal; view(3)
+legend('S/C 1', 'S/C 2', 'location', 'best');
 title('Relative Position')
