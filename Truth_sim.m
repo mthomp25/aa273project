@@ -7,7 +7,35 @@
 % clear variables
 % close all
 
-addpath('functions');
+function x_true = Truth_sim(dur, dt, plotFlag)
+% Compute true relative state between 2 spacecraft from predefined orbits.
+% The dynamics include 2-body gravity, J2 oblateness effect, and air drag
+%
+% Inputs
+% ------
+% dur       sim duration time [s]
+% dt        time step [s]
+% plotFlag  Option to generate plot of orbit
+%           0 (default) - no plots
+%           1 - plot
+%
+% Outputs
+% -------
+% x_true  	truth state vector [10xN] where N is number of time steps
+%           [rho;       [km]
+%            rhodot;    [km/s]
+%            r;         [km]
+%            theta;     [rad]
+%            rdot;      [km/s]
+%            thetadot]  [rad/s]
+%
+
+if nargin < 3
+    plotFlag = 0;
+end
+%% Simulation time
+tspan = 0:dt:dur; 
+
 %% Constants
 RE = 6378.137;          % [km]
 mu = 398600.4415;       % [km^3/s^2] (Montenbruck)
@@ -16,7 +44,7 @@ J2 = 1.08263e-3;
 m1 = 500;       % [kg]
 m2 = 300;       % [kg]
 CD = 2.3;
-A1 = 20e-6;      % [km^2]
+A1 = 20e-6;     % [km^2]
 A2 = 5e-6;      % [km^2]
 rho0 = 1.225e9; % [kg/km^3]
 h0 = 0;         % [km]
@@ -60,13 +88,11 @@ f2 = deg2rad(2); % [rad]
 [r0_2, v0_2] = oe2eci(a2, e2, i2, O2, w2, f2, mu);
 
 %% Simulate using numerical integration
-dt = 5; % [s]
-tspan = 0:5:(86400*3); % Run for 3 days
 options = odeset('RelTol', 1e-6, 'AbsTol', 1e-9);
 
 % Simulate Spacecraft 1
 y_init1 = [r0_1, v0_1];
-[t_out, y_out1] = ode113(@(t,y) get_statedot(t, y, mu, rho0, h0, H, B1),...
+[~, y_out1] = ode113(@(t,y) get_statedot(t, y, mu, rho0, h0, H, B1),...
                     tspan, y_init1, options);
             
 % Simulate Spacecraft 2
@@ -118,23 +144,28 @@ for i = 1:N
     % theta dot
     thetadot(:,i) = h/norm(r1_eci(:,i))^2; 
 end
-            
+
+% Truth state
+x_true = [rho; rhodot; r; theta; rdot; thetadot];
+
 %% Plot orbits
-figure
-grid on; hold on;
-earthPlot
-plot3(r1_eci(1,:), r1_eci(2,:), r1_eci(3,:), '--m', 'LineWidth', 2);
-plot3(r2_eci(1,:), r2_eci(2,:), r2_eci(3,:), '--g', 'LineWidth', 2);
-axis equal;
-xlabel('X [km]'); ylabel('Y [km]'); zlabel('Z [km]');
-legend('S/C 1', 'S/C 2');
+if plotFlag
+    figure
+    grid on; hold on;
+    earthPlot
+    plot3(r1_eci(1,:), r1_eci(2,:), r1_eci(3,:), '--m', 'LineWidth', 2);
+    plot3(r2_eci(1,:), r2_eci(2,:), r2_eci(3,:), '--g', 'LineWidth', 2);
+    axis equal;
+    xlabel('X [km]'); ylabel('Y [km]'); zlabel('Z [km]');
+    legend('S/C 1', 'S/C 2');
 
 %% Plot relative motion
-figure
-grid on; hold on;
-plot3(0,0,0, '*r')
-plot3(rho(2,:), rho(3,:), rho(1,:), 'LineWidth', 2)
-zlabel('\rho_R (m)'); xlabel('\rho_T (m)'); ylabel('\rho_N (m)');
-axis equal; view(3)
-legend('S/C 1', 'S/C 2', 'location', 'best');
-title('Relative Position')
+    figure
+    grid on; hold on;
+    plot3(0,0,0, '*r')
+    plot3(rho(2,:), rho(3,:), rho(1,:), 'LineWidth', 2)
+    zlabel('\rho_R (m)'); xlabel('\rho_T (m)'); ylabel('\rho_N (m)');
+    axis equal; view(3)
+    legend('S/C 1', 'S/C 2', 'location', 'best');
+    title('Relative Position')
+end

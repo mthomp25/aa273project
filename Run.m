@@ -7,6 +7,10 @@
 clear variables
 close all
 
-%% Constants
-RE = 6378.137;          % [km]
-mu = 398600.4415;       % [km^3/s^2] (Montenbruck)
+addpath('functions');
+
+%% Get truth state
+dur = 86400*3;% [s] Run for 3 days
+dt = 5; % [s]
+
+x_true = Truth_sim(dur, dt);
