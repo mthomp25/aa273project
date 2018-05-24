@@ -4,8 +4,8 @@
 %
 % Final Project
 %
-clear variables
-close all
+% clear variables
+% close all
 
 addpath('functions');
 %% Constants
@@ -61,7 +61,7 @@ f2 = deg2rad(2); % [rad]
 
 %% Simulate using numerical integration
 dt = 5; % [s]
-tspan = 0:5:(86400*10); % Run for 10 days
+tspan = 0:5:(86400*3); % Run for 3 days
 options = odeset('RelTol', 1e-6, 'AbsTol', 1e-9);
 
 % Simulate Spacecraft 1
@@ -70,16 +70,70 @@ y_init1 = [r0_1, v0_1];
                     tspan, y_init1, options);
             
 % Simulate Spacecraft 2
-y_init2 = [r0_1, v0_1];
+y_init2 = [r0_2, v0_2];
 [~, y_out2] = ode113(@(t,y) get_statedot(t, y, mu, rho0, h0, H, B2), ...
-                tspan, y_init1, options);
+                tspan, y_init2, options);
             
 % Extract simulation outputs
-% r1_eci =
+r1_eci = y_out1(:,1:3)';
+v1_eci = y_out1(:,4:6)';
+r2_eci = y_out2(:,1:3)';
+v2_eci = y_out2(:,4:6)';
+
+%% Convert to states
+% x = [rho, rhodot, r, theta, rdot, thetadot]
+
+N = length(tspan);
+
+% Rotation matrices
+R_eci2rtn = ECI2RTN(r1_eci, v1_eci);
+
+rho = zeros(3,N);
+rhodot = zeros(3,N);
+r = zeros(1,N);
+theta = zeros(1,N);
+rdot = zeros(1,N);
+thetadot = zeros(1,N); 
+for i = 1:N
+    % Relative position
+    rho(:,i) = R_eci2rtn(:,:,i)*(r2_eci(:,i) - r1_eci(:,i));
+    
+    % Relative velocity
+    h = norm(cross(r1_eci(:,i), v1_eci(:,i)));
+    omd = h/norm(r1_eci(:,i))^2; 
+    
+    rhodot(:,i) = R_eci2rtn(:,:,i)*(v2_eci(:,i) - v1_eci(:,i)) - ...
+                    cross([0;0;omd], rho(:,i));
+
+    r(:,i) = norm(r1_eci(:,i));
+    
+    % Compute orbital elements
+    [~, ~, ~, ~, w, f] = eci2oe(r1_eci(:,i), v1_eci(:,i), mu);
+    theta(:,i) = w + f; % true argument of latitude
+    
+    % Inertial velocity in the rotating frame
+    v_RTN = R_eci2rtn(:,:,i)* v1_eci(:,i); % velocity in rotating frame.
+    rdot(:,i) = v_RTN(1);
+    
+    % theta dot
+    thetadot(:,i) = h/norm(r1_eci(:,i))^2; 
+end
             
 %% Plot orbits
 figure
 grid on; hold on;
 earthPlot
-
+plot3(r1_eci(1,:), r1_eci(2,:), r1_eci(3,:), '--m', 'LineWidth', 2);
+plot3(r2_eci(1,:), r2_eci(2,:), r2_eci(3,:), '--g', 'LineWidth', 2);
 axis equal;
+xlabel('X [km]'); ylabel('Y [km]'); zlabel('Z [km]');
+legend('S/C 1', 'S/C 2');
+
+%% Plot relative motion
+figure
+grid on; hold on;
+plot3(0,0,0, '*r')
+plot3(rho(2,:), rho(3,:), rho(1,:), 'LineWidth', 2)
+zlabel('\rho_R (m)'); xlabel('\rho_T (m)'); ylabel('\rho_N (m)');
+axis equal; view(3)
+title('Relative Position')
