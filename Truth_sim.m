@@ -54,35 +54,35 @@ B2 = CD*A2/m2; % Ballistic coef of spacecraft 2
 
 %% Initial conditions of spacecraft
 % --------------- Spacecraft 1 -------------------
-% semi-major axis
-a1 = RE + 586; % [km]
+% semi-major axis (LEO)
+a1 = RE + 586;              % [km]
 % eccentricity
 e1 = 0.01234567;
 % inclination 
-i1 = deg2rad(63); % [rad]
+i1 = deg2rad(63);           % [rad]
 % Right ascension of the ascending node
-O1 = deg2rad(4); % [rad]
+O1 = deg2rad(4);            % [rad]
 % argument of perigee
-w1 = deg2rad(125); % [rad]
+w1 = deg2rad(125);          % [rad]
 % true anomaly
-f1 = deg2rad(0); % [rad]
+f1 = deg2rad(0);            % [rad]
 
 % Convert to ECI position and velocity 
 [r0_1, v0_1] = oe2eci(a1, e1, i1, O1, w1, f1, mu);
 
 % --------------- Spacecraft 2 -------------------
-% semi-major axis
-a2 = a1; % [km]
+% semi-major axis (slightly lower, will catch up to S/C 1)
+a2 = a1-0.2;                % [km]
 % eccentricity
-e2 = e1;
-% inclination 
-i2 = i1 + deg2rad(10); % [rad]
+e2 = e1*1.05;
+% inclination (slight offset to have cross-track separataion)
+i2 = i1 + deg2rad(0.001);   % [rad]
 % Right ascension of the ascending node
-O2 = O1; % [rad]
+O2 = O1;                    % [rad]
 % argument of perigee
-w2 = w1; % [rad]
-% true anomaly
-f2 = deg2rad(2); % [rad]
+w2 = w1;                    % [rad]
+% true anomaly (start it "behind" S/C 1)
+f2 = deg2rad(-0.1);         % [rad]
 
 % Convert to ECI position and velocity 
 [r0_2, v0_2] = oe2eci(a2, e2, i2, O2, w2, f2, mu);

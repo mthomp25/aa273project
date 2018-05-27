@@ -10,8 +10,8 @@ close all
 addpath('functions');
 
 %% Get truth state
-dur = 86400*3;% [s] Run for 3 days
-dt = 5; % [s]
+dur = 86400*1;% [s] Run for 1 days
+dt = 5; % [s] (this could probably be as large as 30s)
 t = 0:dt:dur;
 tsteps = length(t);
 
@@ -30,6 +30,12 @@ Q = 0.1*eye(nstates);
 R = 0.1; % should measurement noise be different for the 
          % different measurements? e.g. because rchief is much
          % larger than rhox
+R = [0.0001*eye(3) zeros(3,7); % 10 cm noise on pos measurement?
+     zeros(3) 1e-6*eye(3) zeros(3,4); % 1 mm/s noise on vel. Wait, shoud this be sqrt?
+     zeros(1,6) 0.001 0 0 0; % 1 m error on absolute position
+     zeros(1,7) 1e-5 0 0; % not sure how big this should be [rad]
+     zeros(1,8) 1e-5 0; % 1 cm/s error on absolute velocity
+     zeros(1,9) 1e-7]; % again, idk [rad/s]
 
 mu0 = [1, 1, 1, 1, 1, 1, 7000, 0, 0, 1]'; % random initial guess
 cov0 = 100.*eye(nstates)'; % very uncertain
@@ -86,3 +92,30 @@ title('Relative velocities')
 
 
 disp(['Average EKF loop time: ' num2str(mean(EKF_time)) ' sec'])
+
+figure % plot relative position
+subplot(2,2,1)
+hold on; 
+plot(x_true(2,:)*1000, x_true(1,:)*1000, 'k--', 'LineWidth', 2)
+plot(mu_EKF(2,:)*1000, mu_EKF(1,:)*1000, 'b', 'LineWidth', 2)
+xlabel('\rho_T (m)'); ylabel('\rho_R (m)'); grid on; axis equal;
+legend('actual', 'EKF')
+subplot(2,2,2)
+hold on; 
+plot(x_true(3,:)*1000, x_true(1,:)*1000, 'k--', 'LineWidth', 2)
+plot(mu_EKF(3,:)*1000, mu_EKF(1,:)*1000, 'b', 'LineWidth', 2)
+xlabel('\rho_N (m)'); ylabel('\rho_R (m)'); grid on; axis equal;
+subplot(2,2,3)
+hold on; 
+plot(x_true(2,:)*1000, x_true(3,:)*1000, 'k--', 'LineWidth', 2)
+plot(mu_EKF(2,:)*1000, mu_EKF(3,:)*1000, 'b', 'LineWidth', 2)
+xlabel('\rho_T (m)'); ylabel('\rho_N (m)'); grid on; axis equal;
+subplot(2,2,4)
+plot3(x_true(2,:)*1000, x_true(3,:)*1000, x_true(1,:)*1000, 'k--', ...
+        'LineWidth', 2)
+plot3(mu_EKF(2,:)*1000, mu_EKF(3,:)*1000, mu_EKF(1,:)*1000, 'b', ...
+        'LineWidth', 2)
+grid on;
+zlabel('\rho_R (m)'); xlabel('\rho_T (m)'); ylabel('\rho_N (m)');
+view(3);
+axis equal;
