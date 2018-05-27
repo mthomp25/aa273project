@@ -51,7 +51,7 @@ EKF_time = zeros(1, tsteps-1);
 
 
 for tstep = 2:tsteps
-    t = dt*(tstep-1);
+%     t = dt*(tstep-1);
     
     % for now, we have no control
     
@@ -119,3 +119,62 @@ grid on;
 zlabel('\rho_R (m)'); xlabel('\rho_T (m)'); ylabel('\rho_N (m)');
 view(3);
 axis equal;
+
+% TODO: Plot ECI or ECEF?
+
+%% Error plots
+figure;  % plot relative position error (truth - EKF)
+subplot(3,1,1)
+plot(t, x_true(1,:) - mu_EKF(1,:));
+% TODO: Plot covariance?
+grid on;
+ylabel('\rho_R error [km]');
+subplot(3,1,2)
+plot(t, x_true(2,:) - mu_EKF(2,:));
+title('Relative position error')
+grid on;
+ylabel('\rho_T error [km]');
+subplot(3,1,3)
+plot(t, x_true(3,:) - mu_EKF(3,:));
+grid on;
+ylabel('\rho_N error [km]');
+xlabel('Time [s]')
+
+
+figure;  % plot relative velocity error (truth - EKF)
+subplot(3,1,1)
+plot(t, x_true(4,:) - mu_EKF(4,:));
+% TODO: Plot covariance?
+grid on;
+ylabel('\rho_R error [km]');
+title('Relative velocity error')
+subplot(3,1,2)
+plot(t, x_true(5,:) - mu_EKF(5,:));
+grid on;
+ylabel('\rho_T error [km]');
+subplot(3,1,3)
+plot(t, x_true(6,:) - mu_EKF(6,:));
+grid on;
+ylabel('\rho_N error [km]');
+xlabel('Time [s]')
+
+figure;  % plot relative velocity error (truth - EKF)
+subplot(4,1,1)
+plot(t, x_true(7,:) - mu_EKF(7,:));
+% TODO: Plot covariance?
+grid on;
+ylabel('r error [km]');
+title('Absolute position and velocity error')
+subplot(4,1,2)
+plot(t, x_true(8,:) - mu_EKF(8,:));
+grid on;
+ylabel('\theta error [rad]');
+subplot(4,1,3)
+plot(t, x_true(9,:) - mu_EKF(9,:));
+grid on;
+ylabel('$\dot{r}$ error [km/s]', 'Interpreter','latex')
+subplot(4,1,4)
+plot(t, x_true(10,:) - mu_EKF(10,:));
+grid on;
+ylabel('$\dot{\theta}$ error [km/s]', 'Interpreter','latex')
+xlabel('Time [s]')
