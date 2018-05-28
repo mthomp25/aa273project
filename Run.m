@@ -65,7 +65,7 @@ for tstep = 2:tsteps
     % EKF
     tic;
     [mu_EKF(:, tstep), cov_EKF(:, :, tstep)] = ...
-        proj_EKF(y, mu_EKF(:, tstep-1), cov_EKF(:, :, tstep-1), Q, R);
+        proj_EKF(y, mu_EKF(:, tstep-1), cov_EKF(:, :, tstep-1), Q, R, dt);
     EKF_time(tstep-1) = toc;
 end
 
