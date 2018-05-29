@@ -2,7 +2,7 @@ function [mu, cov] = proj_EKF(y, mut, covt, Q, R, dt)
 
     % EKF predict
     At = A_t(mut, dt); % TODO: replace with A function
-    mu = lin_dyn(mut, dt); %At*mut; % no control
+    mu = non_lin_dyn(mut, dt); %At*mut; % no control
     cov = At*covt*At' + Q;
 
     % EKF update
@@ -14,7 +14,7 @@ function [mu, cov] = proj_EKF(y, mut, covt, Q, R, dt)
 end
 
 
-function x_tp1 = lin_dyn(x, dt)
+function x_tp1 = non_lin_dyn(x, dt)
 x1=x(1); x2=x(2); x3=x(3); x4=x(4); x5=x(5); 
 x6=x(6); x7=x(7); x8=x(8); x9=x(9); x10=x(10); 
 % TODO, make this not hard-coded
