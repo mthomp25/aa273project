@@ -42,10 +42,10 @@ mu = 398600.4415;       % [km^3/s^2] (Montenbruck)
 J2 = 1.08263e-3;
 
 m1 = 500;       % [kg]
-m2 = 300;       % [kg]
+m2 = 500;       % [kg]
 CD = 2.3;
-A1 = 20e-6;     % [km^2]
-A2 = 5e-6;      % [km^2]
+A1 = 5e-6;     % [km^2]
+A2 = 7e-6;      % [km^2]
 rho0 = 1.225e9; % [kg/km^3]
 h0 = 0;         % [km]
 H = 10;         % [km]
@@ -72,17 +72,19 @@ f1 = deg2rad(0);            % [rad]
 
 % --------------- Spacecraft 2 -------------------
 % semi-major axis (slightly lower, will catch up to S/C 1)
-a2 = a1-0.2;                % [km]
+a2 = a1-0.002;                % [km]
 % eccentricity
-e2 = e1*1.05;
+% e2 = e1*1.05;
+e2 = e1;
 % inclination (slight offset to have cross-track separataion)
-i2 = i1 + deg2rad(0.001);   % [rad]
+% i2 = i1 + deg2rad(0.001);   % [rad]
+i2 = i1;  
 % Right ascension of the ascending node
 O2 = O1;                    % [rad]
 % argument of perigee
 w2 = w1;                    % [rad]
 % true anomaly (start it "behind" S/C 1)
-f2 = deg2rad(-0.1);         % [rad]
+f2 = deg2rad(-0.001);         % [rad]
 
 % Convert to ECI position and velocity 
 [r0_2, v0_2] = oe2eci(a2, e2, i2, O2, w2, f2, mu);

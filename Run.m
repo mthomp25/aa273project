@@ -10,7 +10,8 @@ close all
 addpath('functions');
 
 %% Get truth state
-dur = 86400*1;% [s] Run for 1 days
+dur = 86400*1.3;% [s] Run for 1 days
+
 dt = 5; % [s] (this could probably be as large as 30s)
 t = 0:dt:dur;
 tsteps = length(t);
@@ -74,8 +75,9 @@ end
 % TODO: plot both satellites' positions relative to Earth
 figure; hold on;
 plot3(x_true(1,:), x_true(2,:), x_true(3,:), 'k--');
-plot3(mu_EKF(1,:), mu_EKF(2,:), mu_EKF(3,:), 'b')
-legend('actual', 'EKF')
+plot3(mu_EKF(1,2:end), mu_EKF(2,2:end), mu_EKF(3,2:end), 'b')
+scatter3(x_true(1,1), x_true(2,1), x_true(3,1), 'o');
+legend('actual', 'EKF', 'start')
 xlabel('x');
 ylabel('y');
 zlabel('z');
@@ -83,7 +85,7 @@ title('Relative positions')
 
 figure; hold on;
 plot3(x_true(4,:), x_true(5,:), x_true(6,:), 'k--');
-plot3(mu_EKF(4,:), mu_EKF(5,:), mu_EKF(6,:), 'b')
+plot3(mu_EKF(4,2:end), mu_EKF(5,2:end), mu_EKF(6,2:end), 'b')
 legend('actual', 'EKF')
 xlabel('x');
 ylabel('y');
@@ -97,29 +99,40 @@ figure % plot relative position
 subplot(2,2,1)
 hold on; 
 plot(x_true(2,:)*1000, x_true(1,:)*1000, 'k--', 'LineWidth', 2)
-plot(mu_EKF(2,:)*1000, mu_EKF(1,:)*1000, 'b', 'LineWidth', 2)
+plot(mu_EKF(2,2:end)*1000, mu_EKF(1,2:end)*1000, 'b', 'LineWidth', 2)
+scatter(x_true(2,1)*1000, x_true(1,1)*1000, 'o');
 xlabel('\rho_T (m)'); ylabel('\rho_R (m)'); grid on; axis equal;
-legend('actual', 'EKF')
+legend('actual', 'EKF', 'start')
 subplot(2,2,2)
 hold on; 
 plot(x_true(3,:)*1000, x_true(1,:)*1000, 'k--', 'LineWidth', 2)
-plot(mu_EKF(3,:)*1000, mu_EKF(1,:)*1000, 'b', 'LineWidth', 2)
+plot(mu_EKF(3,2:end)*1000, mu_EKF(1,2:end)*1000, 'b', 'LineWidth', 2)
+scatter(x_true(3,1)*1000, x_true(1,1)*1000, 'o');
 xlabel('\rho_N (m)'); ylabel('\rho_R (m)'); grid on; axis equal;
 subplot(2,2,3)
 hold on; 
 plot(x_true(2,:)*1000, x_true(3,:)*1000, 'k--', 'LineWidth', 2)
-plot(mu_EKF(2,:)*1000, mu_EKF(3,:)*1000, 'b', 'LineWidth', 2)
+plot(mu_EKF(2,2:end)*1000, mu_EKF(3,2:end)*1000, 'b', 'LineWidth', 2)
+scatter(x_true(2,1)*1000, x_true(3,1)*1000, 'o');
 xlabel('\rho_T (m)'); ylabel('\rho_N (m)'); grid on; axis equal;
 subplot(2,2,4)
+hold on;
 plot3(x_true(2,:)*1000, x_true(3,:)*1000, x_true(1,:)*1000, 'k--', ...
         'LineWidth', 2)
-plot3(mu_EKF(2,:)*1000, mu_EKF(3,:)*1000, mu_EKF(1,:)*1000, 'b', ...
-        'LineWidth', 2)
+plot3(mu_EKF(2,2:end)*1000, mu_EKF(3,2:end)*1000, mu_EKF(1,2:end)*1000,...
+        'b', 'LineWidth', 2)
+scatter3(x_true(2,1)*1000, x_true(3,1)*1000, x_true(1,1)*1000, 'o');
 grid on;
 zlabel('\rho_R (m)'); xlabel('\rho_T (m)'); ylabel('\rho_N (m)');
 view(3);
-axis equal;
+% axis equal;
 
+range = vecnorm(x_true(1:3,:),1);
+% Plot range
+figure
+plot(t,range*1000)
+ylabel('Separation [m]')
+xlabel('Time [s]')
 % TODO: Plot ECI or ECEF?
 
 %% Error plots
