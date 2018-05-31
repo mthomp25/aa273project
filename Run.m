@@ -35,7 +35,7 @@ R = [0.0001*eye(3) zeros(3,7); % 10 cm noise on pos measurement?
      zeros(1,6) 0.001 0 0 0; % 1 m error on absolute position
      zeros(1,7) 1e-5 0 0; % not sure how big this should be [rad]
      zeros(1,8) 1e-5 0; % 1 cm/s error on absolute velocity
-     zeros(1,9) 1e-7]; % again, idk [rad/s]
+     zeros(1,9) 1e-7].^2; % again, idk [rad/s]
 
 mu0 = [1, 1, 1, 1, 1, 1, 7000, 0, 0, 1]'; % random initial guess
 cov0 = 100.*eye(nstates)'; % very uncertain
@@ -125,17 +125,17 @@ axis equal;
 %% Error plots
 figure;  % plot relative position error (truth - EKF)
 subplot(3,1,1)
-plot(t, x_true(1,:) - mu_EKF(1,:));
+plot(t(2:end), x_true(1,2:end) - mu_EKF(1,2:end));
 % TODO: Plot covariance?
 grid on;
 ylabel('\rho_R error [km]');
 subplot(3,1,2)
-plot(t, x_true(2,:) - mu_EKF(2,:));
+plot(t(2:end), x_true(2,2:end) - mu_EKF(2,2:end));
 title('Relative position error')
 grid on;
 ylabel('\rho_T error [km]');
 subplot(3,1,3)
-plot(t, x_true(3,:) - mu_EKF(3,:));
+plot(t(2:end), x_true(3,2:end) - mu_EKF(3,2:end));
 grid on;
 ylabel('\rho_N error [km]');
 xlabel('Time [s]')
@@ -143,38 +143,38 @@ xlabel('Time [s]')
 
 figure;  % plot relative velocity error (truth - EKF)
 subplot(3,1,1)
-plot(t, x_true(4,:) - mu_EKF(4,:));
+plot(t(2:end), x_true(4,2:end) - mu_EKF(4,2:end));
 % TODO: Plot covariance?
 grid on;
 ylabel('\rho_R error [km]');
 title('Relative velocity error')
 subplot(3,1,2)
-plot(t, x_true(5,:) - mu_EKF(5,:));
+plot(t(2:end), x_true(5,2:end) - mu_EKF(5,2:end));
 grid on;
 ylabel('\rho_T error [km]');
 subplot(3,1,3)
-plot(t, x_true(6,:) - mu_EKF(6,:));
+plot(t(2:end), x_true(6,2:end) - mu_EKF(6,2:end));
 grid on;
 ylabel('\rho_N error [km]');
 xlabel('Time [s]')
 
 figure;  % plot relative velocity error (truth - EKF)
 subplot(4,1,1)
-plot(t, x_true(7,:) - mu_EKF(7,:));
+plot(t(2:end), x_true(7,2:end) - mu_EKF(7,2:end));
 % TODO: Plot covariance?
 grid on;
 ylabel('r error [km]');
 title('Absolute position and velocity error')
 subplot(4,1,2)
-plot(t, x_true(8,:) - mu_EKF(8,:));
+plot(t(2:end), x_true(8,2:end) - mu_EKF(8,2:end));
 grid on;
 ylabel('\theta error [rad]');
 subplot(4,1,3)
-plot(t, x_true(9,:) - mu_EKF(9,:));
+plot(t(2:end), x_true(9,2:end) - mu_EKF(9,2:end));
 grid on;
 ylabel('$\dot{r}$ error [km/s]', 'Interpreter','latex')
 subplot(4,1,4)
-plot(t, x_true(10,:) - mu_EKF(10,:));
+plot(t(2:end), x_true(10,2:end) - mu_EKF(10,2:end));
 grid on;
 ylabel('$\dot{\theta}$ error [km/s]', 'Interpreter','latex')
 xlabel('Time [s]')
