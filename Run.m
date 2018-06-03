@@ -151,9 +151,9 @@ plot(t(2:end), x_true(1,2:end) - mu_EKF(1,2:end));
 % TODO: Plot covariance?
 grid on;
 ylabel('\rho_R error [km]');
+title('Relative position error')
 subplot(4,1,2)
 plot(t(2:end), x_true(2,2:end) - mu_EKF(2,2:end));
-title('Relative position error')
 grid on;
 ylabel('\rho_T error [km]');
 subplot(4,1,3)
