@@ -78,7 +78,7 @@ a2 = a1-0.002;                % [km]
 e2 = e1;
 % inclination (slight offset to have cross-track separataion)
 % i2 = i1 + deg2rad(0.001);   % [rad]
-i2 = i1;  
+i2 = i1 + deg2rad(0.0001);  
 % Right ascension of the ascending node
 O2 = O1;                    % [rad]
 % argument of perigee
