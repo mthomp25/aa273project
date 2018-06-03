@@ -50,6 +50,7 @@ cov_EKF(:, :, 1) = cov0;
 % set up timers
 EKF_time = zeros(1, tsteps-1);
 
+in_view = zeros(1, tsteps);
 
 for tstep = 2:tsteps
 %     t = dt*(tstep-1);
@@ -59,14 +60,22 @@ for tstep = 2:tsteps
     % propogate state to get xt
     xt = x_true(:, tstep);
     
+    % check if it's in view
+    if abs(xt(1)/xt(2)) < tand(70) && abs(xt(1)/xt(2)) < tand(70) && xt(2) < 0
+        in_view(tstep) = 1;
+    end
+    
     % get measurement at t (measurement right now is just noisy truth)
-    V = sqrtm(R)*randn(nstates,1);
-    y = xt + V;
+    %V = sqrtm(R)*randn(nstates,1);
+    %y = xt + V;
+    
+    [y,~,R] = measure(xt); %true measurement
+    y = y + sqrtm(R)*randn(length(R(:,1)),1); %add noise
     
     % EKF
     tic;
     [mu_EKF(:, tstep), cov_EKF(:, :, tstep)] = ...
-        proj_EKF_Num_Int(y, mu_EKF(:, tstep-1), cov_EKF(:, :, tstep-1), Q, R, dt);
+        proj_EKF(y, mu_EKF(:, tstep-1), cov_EKF(:, :, tstep-1), Q, R, dt);
     EKF_time(tstep-1) = toc;
 end
 
@@ -137,22 +146,27 @@ xlabel('Time [s]')
 
 %% Error plots
 figure;  % plot relative position error (truth - EKF)
-subplot(3,1,1)
+subplot(4,1,1)
 plot(t(2:end), x_true(1,2:end) - mu_EKF(1,2:end));
 % TODO: Plot covariance?
 grid on;
 ylabel('\rho_R error [km]');
-subplot(3,1,2)
+subplot(4,1,2)
 plot(t(2:end), x_true(2,2:end) - mu_EKF(2,2:end));
 title('Relative position error')
 grid on;
 ylabel('\rho_T error [km]');
-subplot(3,1,3)
+subplot(4,1,3)
 plot(t(2:end), x_true(3,2:end) - mu_EKF(3,2:end));
 grid on;
 ylabel('\rho_N error [km]');
-xlabel('Time [s]')
 
+subplot(4,1,4)
+plot(t, in_view);
+ylim([-.5 1.5])
+grid on;
+ylabel('In Camera');
+xlabel('Time [s]');
 
 figure;  % plot relative velocity error (truth - EKF)
 subplot(3,1,1)
