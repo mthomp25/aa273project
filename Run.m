@@ -28,15 +28,6 @@ x_true = Truth_sim(dur, dt);
 % TODO: what do we want our noise to be?
 nstates = size(x_true,1);
 Q = 0.1*eye(nstates);
-R = 0.1; % should measurement noise be different for the 
-         % different measurements? e.g. because rchief is much
-         % larger than rhox
-R = [0.0001*eye(3) zeros(3,7); % 10 cm noise on pos measurement?
-     zeros(3) 1e-6*eye(3) zeros(3,4); % 1 mm/s noise on vel. Wait, shoud this be sqrt?
-     zeros(1,6) 0.001 0 0 0; % 1 m error on absolute position
-     zeros(1,7) 1e-5 0 0; % not sure how big this should be [rad]
-     zeros(1,8) 1e-5 0; % 1 cm/s error on absolute velocity
-     zeros(1,9) 1e-7].^2; % again, idk [rad/s]
 
 mu0 = [1, 1, 1, 1, 1, 1, 7000, 0, 0, 1]'; % random initial guess
 cov0 = 100.*eye(nstates)'; % very uncertain
@@ -75,7 +66,7 @@ for tstep = 2:tsteps
     % EKF
     tic;
     [mu_EKF(:, tstep), cov_EKF(:, :, tstep)] = ...
-        proj_EKF(y, mu_EKF(:, tstep-1), cov_EKF(:, :, tstep-1), Q, R, dt);
+        proj_EKF(y, mu_EKF(:, tstep-1), cov_EKF(:, :, tstep-1), Q, dt);
     EKF_time(tstep-1) = toc;
 end
 

@@ -1,4 +1,4 @@
-function [mu, cov] = proj_EKF(y, mut, covt, Q, R, dt) 
+function [mu, cov] = proj_EKF(y, mut, covt, Q, dt) 
 
     % EKF predict
     At = A_t(mut, dt); % TODO: replace with A function
