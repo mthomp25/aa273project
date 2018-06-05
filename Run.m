@@ -25,12 +25,24 @@ x_true = Truth_sim(dur, dt);
 %            rdot;      [km/s]
 %            thetadot]  [rad/s]
 
-% TODO: what do we want our noise to be?
-nstates = size(x_true,1);
-Q = 0.1*eye(nstates);
+% =========== flip the states =============
+rdot = x_true(8,:);
+x_true(8,:) = x_true(9,:);
+x_true(9,:) = rdot;
+% x_true  	truth state vector [10xN] where N is number of time steps
+%           [rho;       [km]
+%            rhodot;    [km/s]
+%            r;         [km]
+%            rdot;      [km/s]
+%            theta;     [rad]
+%            thetadot]  [rad/s]
 
-mu0 = [1, 1, 1, 1, 1, 1, 7000, 0, 0, 1]'; % random initial guess
-cov0 = 100.*eye(nstates)'; % very uncertain
+nstates = size(x_true,1);
+Qdiag = [0.01, 0.01, 0.01, 1e-5, 1e-5, 1e-5, 10, 0.01, 1e-2, 1e-6];
+Q = diag(Qdiag.^2);
+
+mu0 = [0.1, 0.1, 0.01, 1, 1, 1, 7000, 0, 2, 1e-3]'; % random initial guess
+cov0 = 100.*diag(Qdiag); % very uncertain
 
 % Initialize EKF
 mu_EKF = zeros(nstates, tsteps);

@@ -11,8 +11,8 @@ C = eye(10); %GPS
 Rdiag = [0.0001*ones(3,1); % 10 cm noise on pos measurement?
      	1e-6*ones(3,1); % 1 mm/s noise on vel. Wait, shoud this be sqrt?
         0.001; % 1 m error on absolute position
+        1e-3; % 1 cm/s error on absolute velocity
         1e-5; % not sure how big this should be [rad]
-        1e-5; % 1 cm/s error on absolute velocity
         1e-7]; % again, idk [rad/s]
 
     
