@@ -1,4 +1,4 @@
-function [mu, cov] = proj_EKF_Num_Int(y, mut, covt, Q, R, dt) 
+function [mu, cov] = proj_EKF_Num_Int(y, mut, covt, Q, dt) 
     muEarth = 398600.4415;       % [km^3/s^2] (Montenbruck)
 
     % EKF predict
@@ -9,35 +9,22 @@ function [mu, cov] = proj_EKF_Num_Int(y, mut, covt, Q, R, dt)
     mu = yout(end,:)';
     cov = At*covt*At' + Q;
 
-    % EKF update
-    Ct = eye(10);
-    yhat = mu;
+        % EKF update
+   [yhat, Ct, R] = measure(mu);
+    numGpsMeas = 10;
+    
+    if length(y) ~= length(yhat)
+        y = y(1:numGpsMeas); %just use GPS measurement 
+        yhat = yhat(1:numGpsMeas);
+        Ct = Ct(1:numGpsMeas,:);
+        R = R(1:numGpsMeas, 1:numGpsMeas);
+    end
+    
     Kt = (cov*Ct')/(Ct*cov*Ct' + R);
     mu = mu + Kt*(y - yhat);
     cov = cov - Kt*Ct*cov;
 end
 
-
-function x_tp1 = lin_dyn(x, dt)
-x1=x(1); x2=x(2); x3=x(3); x4=x(4); x5=x(5); 
-x6=x(6); x7=x(7); x8=x(8); x9=x(9); x10=x(10); 
-% TODO, make this not hard-coded
-p = (6378.137+586)*(1-0.01234567^2); %semi-latus rectum of cheif
-
-xdot = [x4;
-    x5;
-    x6;
-    x1*x10^2 *(1 + 2*x7/p) + 2*x10 *(x5-x2*x8/x7);
-    -2*x10 *(x4-x1*x8/x7) + x2*x10^2 *(1-x7/p); 
-    -x7*x10^2 *x3/p;
-    x8;
-    x7*x10^2 *(1-x7/p);
-    x10;
-    -2*x8*x10/x7];
-
-x_tp1 = x + xdot.*dt;
-
-end
 
 function A = A_t(x, dt)
 x1=x(1); x2=x(2); x3=x(3); x4=x(4); x5=x(5); 
