@@ -90,7 +90,7 @@ f2 = deg2rad(-0.001);         % [rad]
 [r0_2, v0_2] = oe2eci(a2, e2, i2, O2, w2, f2, mu);
 
 %% Simulate using numerical integration
-options = odeset('RelTol', 1e-6, 'AbsTol', 1e-9);
+options = odeset('RelTol', 1e-9, 'AbsTol', 1e-12);
 
 % Simulate Spacecraft 1
 y_init1 = [r0_1, v0_1];
