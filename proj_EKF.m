@@ -1,4 +1,4 @@
-function [mu, cov] = proj_EKF(y, mut, covt, Q, R, dt) 
+function [mu, cov] = proj_EKF(y, mut, covt, Q, dt) 
 
     % EKF predict
     At = A_t(mut, dt); % TODO: replace with A function
@@ -6,13 +6,14 @@ function [mu, cov] = proj_EKF(y, mut, covt, Q, R, dt)
     cov = At*covt*At' + Q;
 
     % EKF update
-    [yhat, Ct, R] = measure(mu);
+   [yhat, Ct, R] = measure(mu);
+    numGpsMeas = 10;
     
     if length(y) ~= length(yhat)
-        y = y(1:10); %just use GPS measurement 
-        yhat = yhat(1:10);
-        Ct = Ct(1:10,:);
-        R = R(1:10, 1:10);
+        y = y(1:numGpsMeas); %just use GPS measurement 
+        yhat = yhat(1:numGpsMeas);
+        Ct = Ct(1:numGpsMeas,:);
+        R = R(1:numGpsMeas, 1:numGpsMeas);
     end
     
     Kt = (cov*Ct')/(Ct*cov*Ct' + R);
@@ -62,43 +63,4 @@ A = [
 [  0,  0,  0, dt*(2*x5 - (2*x2*x8)/x7 + 2*x1*x10*((2*x7)/p + 1)), -dt*(2*x4 - (2*x1*x8)/x7 + 2*x2*x10*(x7/p - 1)), -(2*dt*x3*x7*x10)/p,  0, -2*dt*x7*x10*(x7/p - 1), dt,   1 - (2*dt*x8)/x7];
 ];
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% These are replicated in the measure function
-
-function y = g(x)
- 
- 
-ycam = x(1:2)/x(3);
-yrange = norm(x(1:3));
- 
-y = [x];%;ycam;yrange];
- 
-end
- 
-function C = C_t(x)
- 
-C1 = eye(10); %GPS
- 
-C2 = [1/x(3), 0, -x(1)/x(3)^2, zeros(1,7); %camera
-      0, 1/x(3), -x(2)/x(3)^2, zeros(1,7)];    
-  
-C3 = [x(1), x(2), x(3), zeros(1,7)]./norm(x(1:3)); %range
- 
-C = [C1];%;C2;C3];
-end
-
-
 
