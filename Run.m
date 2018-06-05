@@ -42,7 +42,7 @@ Qdiag = [0.01, 0.01, 0.01, 1e-5, 1e-5, 1e-5, 10, 0.01, 1e-2, 1e-6];
 Q = diag(Qdiag.^2);
 
 mu0 = [0.1, 0.1, 0.01, 1, 1, 1, 7000, 0, 2, 1e-3]'; % random initial guess
-cov0 = 100.*diag(Qdiag); % very uncertain
+cov0 = diag([5, 5, 5, 0.02, 0.02, 0.02, 1000, 0.01, 1e-4, 1e-4]);
 
 % Initialize EKF
 mu_EKF = zeros(nstates, tsteps);
@@ -80,6 +80,7 @@ for tstep = 2:tsteps
     [mu_EKF(:, tstep), cov_EKF(:, :, tstep)] = ...
         proj_EKF(y, mu_EKF(:, tstep-1), cov_EKF(:, :, tstep-1), Q, dt);
     EKF_time(tstep-1) = toc;
+
 end
 
 
