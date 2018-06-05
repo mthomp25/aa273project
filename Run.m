@@ -10,7 +10,7 @@ close all
 addpath('functions');
 
 %% Get truth state
-dur = 86400*1.3;% [s] Run for 1 days
+dur = 86400*0.8;% [s] Run for 1 days
 
 dt = 5; % [s] (this could probably be as large as 30s)
 t = 0:dt:dur;
@@ -212,7 +212,7 @@ xlabel('Time [s]')
 
 %% animation 
 % WARNING: Takes a while to run so uncomment at your own risk
-
+% 
 % x = x_true(1,:);
 % y = x_true(2,:);
 % z = x_true(3,:);
@@ -228,9 +228,9 @@ xlabel('Time [s]')
 %     scatter3(y_EKF(i)*1000, z_EKF(i)*1000, x_EKF(i)*1000, 'sb')
 %     xlabel('\rho_T (m)'); ylabel('\rho_N (m)');  zlabel('\rho_R (m)');
 %     grid on; axis equal;
-%     legend('Sat 1', 'Sat 2', 'EKF Est', 'location','best');
+%     legend('Sat 1', 'Sat 2', 'EKF Est', 'location','northwest');
 %     hold off
-%     xlim([-450 100]); ylim([-50 50]); zlim([-50 50]);
+%     xlim([-150 100]); ylim([-50 50]); zlim([-50 50]);
 %     
 %     drawnow
 %     frame = getframe(fig);
@@ -238,7 +238,7 @@ xlabel('Time [s]')
 % end
 % % Save to .gif
 % fname = 'rel_motion.gif';
-% for i  = 1:30:length(x)
+% for i  = 1:50:length(x)
 %     [A, map] = rgb2ind(im{i},256);
 %     if i == 1
 %         imwrite(A,map,fname,'gif','LoopCount',Inf,'DelayTime',1);
