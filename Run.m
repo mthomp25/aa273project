@@ -209,3 +209,40 @@ plot(t(2:end), x_true(10,2:end) - mu_EKF(10,2:end));
 grid on;
 ylabel('$\dot{\theta}$ error [km/s]', 'Interpreter','latex')
 xlabel('Time [s]')
+
+%% animation 
+% WARNING: Takes a while to run so uncomment at your own risk
+
+% x = x_true(1,:);
+% y = x_true(2,:);
+% z = x_true(3,:);
+% x_EKF = mu_EKF(1,:);
+% y_EKF = mu_EKF(2,:);
+% z_EKF = mu_EKF(3,:);
+% 
+% fig = figure;
+% for i = 1:50:length(x)
+%     plot3(0,0,0,'*');
+%     hold on
+%     scatter3(y(i)*1000,z(i)*1000,x(i)*1000, 'o','filled') 
+%     scatter3(y_EKF(i)*1000, z_EKF(i)*1000, x_EKF(i)*1000, 'sb')
+%     xlabel('\rho_T (m)'); ylabel('\rho_N (m)');  zlabel('\rho_R (m)');
+%     grid on; axis equal;
+%     legend('Sat 1', 'Sat 2', 'EKF Est', 'location','best');
+%     hold off
+%     xlim([-450 100]); ylim([-50 50]); zlim([-50 50]);
+%     
+%     drawnow
+%     frame = getframe(fig);
+%     im{i} = frame2im(frame);
+% end
+% % Save to .gif
+% fname = 'rel_motion.gif';
+% for i  = 1:30:length(x)
+%     [A, map] = rgb2ind(im{i},256);
+%     if i == 1
+%         imwrite(A,map,fname,'gif','LoopCount',Inf,'DelayTime',1);
+%     else
+%         imwrite(A,map,fname,'gif','WriteMode','append','DelayTime',0);
+%     end
+% end
