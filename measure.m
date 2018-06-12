@@ -28,7 +28,8 @@ Crange = [x(1), x(2), x(3), zeros(1,7)]./yrange; %range
 
 y = [y; ycam; yrange];
 C = [C; Ccam; Crange];
-Rdiag = [Rdiag; 8.7266e-06*ones(2,1).*ycam*yrange; 1e-5];
+% Rdiag = [Rdiag; 8.7266e-06*ones(2,1).*ycam*yrange; 1e-5];
+Rdiag = [Rdiag; 8.7266e-01/5*ones(2,1)*yrange; 1e-5];
 %end
 
 R = diag(Rdiag.^2);

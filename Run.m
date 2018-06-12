@@ -15,7 +15,7 @@ dur = 86400*0.8;% [s] Run for 1 days
 dt = 5; % [s] (this could probably be as large as 30s)
 t = 0:dt:dur;
 tsteps = length(t);
-MEAS_SCHEME = '2cam_gps'; %options: gps_only, 1cam_gps, 2cam_gps, 1cam_switch, 2cam_switch
+MEAS_SCHEME = '2cam_switch'; %options: gps_only, 1cam_gps, 2cam_gps, 1cam_switch, 2cam_switch
 
 x_true = Truth_sim(dur, dt);
 % x_true  	truth state vector [10xN] where N is number of time steps
@@ -30,6 +30,7 @@ x_true = Truth_sim(dur, dt);
 rdot = x_true(8,:);
 x_true(8,:) = x_true(9,:);
 x_true(9,:) = rdot;
+x_true(9,:) = wrapTo2Pi(x_true(9,:));
 % x_true  	truth state vector [10xN] where N is number of time steps
 %           [rho;       [km]
 %            rhodot;    [km/s]
@@ -39,7 +40,7 @@ x_true(9,:) = rdot;
 %            thetadot]  [rad/s]
 
 nstates = size(x_true,1);
-Qdiag = [0.01, 0.01, 0.01, 1e-5, 1e-5, 1e-5, 10, 0.01, 1e-2, 1e-6];
+Qdiag = [1e-6, 1e-6, 1e-6, 1e-8, 1e-8, 1e-8, 0.2, 0.0001, 1e-5, 1e-8];
 Q = diag(Qdiag.^2);
 
 mu0 = x_true(:,1);
@@ -145,19 +146,28 @@ xlabel('Time [hr]')
 %% Error plots
 figure;  % plot relative position error (truth - EKF)
 ax1=subplot(4,1,1);
+hold on;
 plot(t(2:end), x_true(1,2:end) - mu_EKF(1,2:end));
 % TODO: Plot covariance?
+plot(t(2:end), 3*sqrt(squeeze(cov_EKF(1,1,2:end))), '--r', 'LineWidth', 2);
+plot(t(2:end), -3*sqrt(squeeze(cov_EKF(1,1,2:end))), '--r', 'LineWidth', 2);
 grid on;
-ylabel('\rho_R error [km]');
+ylabel('\rho_R error [km]'); ylim([-1e-3 1e-3])
 title('Relative position error')
 ax2=subplot(4,1,2);
+hold on;
 plot(t(2:end), x_true(2,2:end) - mu_EKF(2,2:end));
+plot(t(2:end), 3*sqrt(squeeze(cov_EKF(2,2,2:end))), '--r', 'LineWidth', 2);
+plot(t(2:end), -3*sqrt(squeeze(cov_EKF(2,2,2:end))), '--r', 'LineWidth', 2);
 grid on;
-ylabel('\rho_T error [km]');
+ylabel('\rho_T error [km]'); ylim([-1e-3 1e-3])
 ax3=subplot(4,1,3);
+hold on;
 plot(t(2:end), x_true(3,2:end) - mu_EKF(3,2:end));
+plot(t(2:end), 3*sqrt(squeeze(cov_EKF(3,3,2:end))), '--r', 'LineWidth', 2);
+plot(t(2:end), -3*sqrt(squeeze(cov_EKF(3,3,2:end))), '--r', 'LineWidth', 2);
 grid on;
-ylabel('\rho_N error [km]');
+ylabel('\rho_N error [km]'); ylim([-1e-3 1e-3])
 
 ax4=subplot(4,1,4);
 plot(t, in_view(1,:), 'k*', t, in_view(2,:), 'r.');
