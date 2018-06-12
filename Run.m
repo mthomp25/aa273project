@@ -208,6 +208,31 @@ grid on;
 ylabel('$\dot{\theta}$ error [km/s]', 'Interpreter','latex')
 xlabel('Time [hr]')
 
+% Plot covariances
+postrace = zeros(1, length(t)-1);
+veltrace = zeros(1, length(t)-1);
+for ii = 2:length(t)
+    postrace(ii-1) = trace(cov_EKF(1:3, 1:3, ii));    
+    veltrace(ii-1) = trace(cov_EKF(4:6, 4:6, ii));
+end
+figure;
+subplot(3,1,1)
+plot(t(2:end), postrace);
+ylabel('Relative Position Covariance Trace');
+grid on;
+subplot(3,1,2)
+plot(t(2:end), veltrace);
+ylabel('Relative Velocity Covariance Trace');
+grid on;
+subplot(3,1,3)
+plot(t, in_view(1,:), 'k*', t, in_view(2,:), 'r.');
+ylim([-.5 1.5])
+grid on;
+ylabel('Activated');
+xlabel('Time [s]');
+legend('VISNAV', 'GPS')
+xlabel('Time [s]');
+
 %% animation 
 % WARNING: Takes a while to run so uncomment at your own risk
 % 
