@@ -42,8 +42,9 @@ nstates = size(x_true,1);
 Qdiag = [0.01, 0.01, 0.01, 1e-5, 1e-5, 1e-5, 10, 0.01, 1e-2, 1e-6];
 Q = diag(Qdiag.^2);
 
-mu0 = x_true(:,1);%[0.1, 0.1, 0.01, 1, 1, 1, 7000, 0, 2, 1e-3]'; % random initial guess
-cov0 = diag([5, 5, 5, 0.02, 0.02, 0.02, 1000, 0.01, 1e-4, 1e-4]);
+mu0 = x_true(:,1);
+mu0 = mu0 + [(rand(3,1)*4e-3-2e-3); rand(3,1)*2e-5 - 1e-5; zeros(4,1)]; % start with some estimation error
+cov0 = diag([5e-3, 5e-3, 5e-3, 0.02e-3, 0.02e-3, 0.02e-3, 1, 0.01e-3, 1e-4, 1e-4]); % taken from Kim et al.
 
 % Initialize EKF
 mu_EKF = zeros(nstates, tsteps);
