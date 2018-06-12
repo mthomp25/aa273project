@@ -133,12 +133,13 @@ zlabel('\rho_R (m)'); xlabel('\rho_T (m)'); ylabel('\rho_N (m)');
 view(3);
 % axis equal;
 
+t = t/3600; % change to hrs
 range = vecnorm(x_true(1:3,:),1);
 % Plot range
 figure
 plot(t,range*1000)
 ylabel('Separation [m]')
-xlabel('Time [s]')
+xlabel('Time [hr]')
 % TODO: Plot ECI or ECEF?
 
 %% Error plots
@@ -163,7 +164,7 @@ plot(t, in_view(1,:), 'k*', t, in_view(2,:), 'r.');
 ylim([-.5 1.5])
 grid on;
 ylabel('Activated');
-xlabel('Time [s]');
+xlabel('Time [hr]');
 legend('VISNAV', 'GPS')
 linkaxes([ax1,ax2,ax3,ax4],'x')
 
@@ -182,7 +183,7 @@ subplot(3,1,3)
 plot(t(2:end), x_true(6,2:end) - mu_EKF(6,2:end));
 grid on;
 ylabel('v_N error [km/s]');
-xlabel('Time [s]')
+xlabel('Time [hr]')
 
 figure;  % plot relative velocity error (truth - EKF)
 subplot(4,1,1)
@@ -203,7 +204,7 @@ subplot(4,1,4)
 plot(t(2:end), x_true(10,2:end) - mu_EKF(10,2:end));
 grid on;
 ylabel('$\dot{\theta}$ error [km/s]', 'Interpreter','latex')
-xlabel('Time [s]')
+xlabel('Time [hr]')
 
 %% animation 
 % WARNING: Takes a while to run so uncomment at your own risk
