@@ -1,4 +1,4 @@
-function [mu, cov] = proj_EKF(y, mut, covt, Q, dt) 
+function [mu, cov, in_view] = proj_EKF(y, mut, covt, Q, dt, MEAS_SCHEME) 
 
     % EKF predict
     At = A_t(mut, dt); % TODO: replace with A function
@@ -8,12 +8,53 @@ function [mu, cov] = proj_EKF(y, mut, covt, Q, dt)
     % EKF update
    [yhat, Ct, R] = measure(mu);
     numGpsMeas = 10;
+
+    if strcmp(MEAS_SCHEME,'1cam_gps') || strcmp(MEAS_SCHEME,'1cam_switch')
+        visible = abs(mu(1)/mu(2)) < tand(70) && abs(mu(3)/mu(2)) < tand(70) && mu(2) < 0;
+    else
+        visible = abs(mu(1)/mu(2)) < tand(70) && abs(mu(3)/mu(2)) < tand(70);
+    end
     
-    if length(y) ~= length(yhat)
+    if strcmp(MEAS_SCHEME,'gps_only')
+        %if length(y) ~= length(yhat)
         y = y(1:numGpsMeas); %just use GPS measurement 
         yhat = yhat(1:numGpsMeas);
         Ct = Ct(1:numGpsMeas,:);
         R = R(1:numGpsMeas, 1:numGpsMeas);
+        
+        in_view = [0;1];
+    elseif strcmp(MEAS_SCHEME,'1cam_gps') || strcmp(MEAS_SCHEME,'2cam_gps')
+        if visible
+            in_view = [1;1];
+        else
+            y = y(1:numGpsMeas); %just use GPS measurement 
+            yhat = yhat(1:numGpsMeas);
+            Ct = Ct(1:numGpsMeas,:);
+            R = R(1:numGpsMeas, 1:numGpsMeas);
+        
+            in_view = [0;1];
+        end
+    elseif strcmp(MEAS_SCHEME,'1cam_switch') || strcmp(MEAS_SCHEME,'2cam_switch')
+        
+        if norm(mu(1:3)) < .03
+            if ~visible
+                in_view = [0;0];
+                return
+            end
+            y = y(numGpsMeas:end); %only use camera
+            yhat = yhat(numGpsMeas:end);
+            Ct = Ct(numGpsMeas:end,:);
+            R = R(numGpsMeas:end, numGpsMeas:end);
+            in_view = [1;0];
+        else
+            y = y(1:numGpsMeas); %just use GPS measurement
+            yhat = yhat(1:numGpsMeas);
+            Ct = Ct(1:numGpsMeas,:);
+            R = R(1:numGpsMeas, 1:numGpsMeas);
+            in_view = [0;1];
+        end
+    else
+        error('MEAS_SCHEME not recognized!!!')
     end
     
     Kt = (cov*Ct')/(Ct*cov*Ct' + R);

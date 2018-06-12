@@ -15,6 +15,7 @@ dur = 86400*0.8;% [s] Run for 1 days
 dt = 5; % [s] (this could probably be as large as 30s)
 t = 0:dt:dur;
 tsteps = length(t);
+MEAS_SCHEME = '2cam_gps'; %options: gps_only, 1cam_gps, 2cam_gps, 1cam_switch, 2cam_switch
 
 x_true = Truth_sim(dur, dt);
 % x_true  	truth state vector [10xN] where N is number of time steps
@@ -41,7 +42,7 @@ nstates = size(x_true,1);
 Qdiag = [0.01, 0.01, 0.01, 1e-5, 1e-5, 1e-5, 10, 0.01, 1e-2, 1e-6];
 Q = diag(Qdiag.^2);
 
-mu0 = [0.1, 0.1, 0.01, 1, 1, 1, 7000, 0, 2, 1e-3]'; % random initial guess
+mu0 = x_true(:,1);%[0.1, 0.1, 0.01, 1, 1, 1, 7000, 0, 2, 1e-3]'; % random initial guess
 cov0 = diag([5, 5, 5, 0.02, 0.02, 0.02, 1000, 0.01, 1e-4, 1e-4]);
 
 % Initialize EKF
@@ -53,7 +54,7 @@ cov_EKF(:, :, 1) = cov0;
 % set up timers
 EKF_time = zeros(1, tsteps-1);
 
-in_view = zeros(1, tsteps);
+in_view = zeros(2, tsteps); %first row = visnav, second row = gps
 
 for tstep = 2:tsteps
 %     t = dt*(tstep-1);
@@ -63,22 +64,13 @@ for tstep = 2:tsteps
     % propogate state to get xt
     xt = x_true(:, tstep);
     
-    % check if it's in view
-    if abs(xt(1)/xt(2)) < tand(70) && abs(xt(1)/xt(2)) < tand(70) && xt(2) < 0
-        in_view(tstep) = 1;
-    end
-    
-    % get measurement at t (measurement right now is just noisy truth)
-    %V = sqrtm(R)*randn(nstates,1);
-    %y = xt + V;
-    
     [y,~,R] = measure(xt); %true measurement
     y = y + sqrtm(R)*randn(length(R(:,1)),1); %add noise
     
     % EKF
     tic;
-    [mu_EKF(:, tstep), cov_EKF(:, :, tstep)] = ...
-        proj_EKF(y, mu_EKF(:, tstep-1), cov_EKF(:, :, tstep-1), Q, dt);
+    [mu_EKF(:, tstep), cov_EKF(:, :, tstep), in_view(:,tstep)] = ...
+        proj_EKF(y, mu_EKF(:, tstep-1), cov_EKF(:, :, tstep-1), Q, dt, MEAS_SCHEME);
     EKF_time(tstep-1) = toc;
 
 end
@@ -150,43 +142,45 @@ xlabel('Time [s]')
 
 %% Error plots
 figure;  % plot relative position error (truth - EKF)
-subplot(4,1,1)
+ax1=subplot(4,1,1);
 plot(t(2:end), x_true(1,2:end) - mu_EKF(1,2:end));
 % TODO: Plot covariance?
 grid on;
 ylabel('\rho_R error [km]');
 title('Relative position error')
-subplot(4,1,2)
+ax2=subplot(4,1,2);
 plot(t(2:end), x_true(2,2:end) - mu_EKF(2,2:end));
 grid on;
 ylabel('\rho_T error [km]');
-subplot(4,1,3)
+ax3=subplot(4,1,3);
 plot(t(2:end), x_true(3,2:end) - mu_EKF(3,2:end));
 grid on;
 ylabel('\rho_N error [km]');
 
-subplot(4,1,4)
-plot(t, in_view);
+ax4=subplot(4,1,4);
+plot(t, in_view(1,:), 'k*', t, in_view(2,:), 'r.');
 ylim([-.5 1.5])
 grid on;
-ylabel('In Camera');
+ylabel('Activated');
 xlabel('Time [s]');
+legend('VISNAV', 'GPS')
+linkaxes([ax1,ax2,ax3,ax4],'x')
 
 figure;  % plot relative velocity error (truth - EKF)
 subplot(3,1,1)
 plot(t(2:end), x_true(4,2:end) - mu_EKF(4,2:end));
 % TODO: Plot covariance?
 grid on;
-ylabel('\rho_R error [km]');
+ylabel('v_R error [km/s]');
 title('Relative velocity error')
 subplot(3,1,2)
 plot(t(2:end), x_true(5,2:end) - mu_EKF(5,2:end));
 grid on;
-ylabel('\rho_T error [km]');
+ylabel('v_T error [km/s]');
 subplot(3,1,3)
 plot(t(2:end), x_true(6,2:end) - mu_EKF(6,2:end));
 grid on;
-ylabel('\rho_N error [km]');
+ylabel('v_N error [km/s]');
 xlabel('Time [s]')
 
 figure;  % plot relative velocity error (truth - EKF)
