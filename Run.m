@@ -52,9 +52,6 @@ cov_EKF = zeros(nstates, nstates, tsteps);
 mu_EKF(:, 1) = mu0;
 cov_EKF(:, :, 1) = cov0;
 
-% set up timers
-EKF_time = zeros(1, tsteps-1);
-
 in_view = zeros(2, tsteps); %first row = visnav, second row = gps
 
 for tstep = 2:tsteps
@@ -69,10 +66,8 @@ for tstep = 2:tsteps
     y = y + sqrtm(R)*randn(length(R(:,1)),1); %add noise
     
     % EKF
-    tic;
     [mu_EKF(:, tstep), cov_EKF(:, :, tstep), in_view(:,tstep)] = ...
         proj_EKF(y, mu_EKF(:, tstep-1), cov_EKF(:, :, tstep-1), Q, dt, MEAS_SCHEME);
-    EKF_time(tstep-1) = toc;
 
 end
 
@@ -97,9 +92,6 @@ xlabel('x');
 ylabel('y');
 zlabel('z');
 title('Relative velocities')
-
-
-disp(['Average EKF loop time: ' num2str(mean(EKF_time)) ' sec'])
 
 figure % plot relative position
 subplot(2,2,1)
