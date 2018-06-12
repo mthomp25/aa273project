@@ -40,7 +40,7 @@ x_true(9,:) = wrapTo2Pi(x_true(9,:));
 %            thetadot]  [rad/s]
 
 nstates = size(x_true,1);
-Qdiag = [1e-6, 1e-6, 1e-6, 1e-8, 1e-8, 1e-8, 0.2, 0.0001, 1e-5, 1e-8];
+Qdiag = [1e-4, 1e-4, 1e-4, 1e-6, 1e-6, 1e-6, 0.2, 0.0001, 1e-5, 1e-8];
 Q = diag(Qdiag.^2);
 
 mu0 = x_true(:,1);
@@ -141,25 +141,25 @@ ax1=subplot(4,1,1);
 hold on;
 plot(t(2:end), x_true(1,2:end) - mu_EKF(1,2:end));
 % TODO: Plot covariance?
-plot(t(2:end), 3*sqrt(squeeze(cov_EKF(1,1,2:end))), '--r', 'LineWidth', 2);
-plot(t(2:end), -3*sqrt(squeeze(cov_EKF(1,1,2:end))), '--r', 'LineWidth', 2);
+plot(t(2:end), 3*sqrt(squeeze(cov_EKF(1,1,2:end))), '--r', 'LineWidth', 1);
+plot(t(2:end), -3*sqrt(squeeze(cov_EKF(1,1,2:end))), '--r', 'LineWidth', 1);
 grid on;
-ylabel('\rho_R error [km]'); ylim([-1e-3 1e-3])
+ylabel('\rho_R error [km]'); %ylim([-1e-3 1e-3])
 title('Relative position error')
 ax2=subplot(4,1,2);
 hold on;
 plot(t(2:end), x_true(2,2:end) - mu_EKF(2,2:end));
-plot(t(2:end), 3*sqrt(squeeze(cov_EKF(2,2,2:end))), '--r', 'LineWidth', 2);
-plot(t(2:end), -3*sqrt(squeeze(cov_EKF(2,2,2:end))), '--r', 'LineWidth', 2);
+plot(t(2:end), 3*sqrt(squeeze(cov_EKF(2,2,2:end))), '--r', 'LineWidth', 1);
+plot(t(2:end), -3*sqrt(squeeze(cov_EKF(2,2,2:end))), '--r', 'LineWidth', 1);
 grid on;
-ylabel('\rho_T error [km]'); ylim([-1e-3 1e-3])
+ylabel('\rho_T error [km]'); %ylim([-1e-3 1e-3])
 ax3=subplot(4,1,3);
 hold on;
 plot(t(2:end), x_true(3,2:end) - mu_EKF(3,2:end));
-plot(t(2:end), 3*sqrt(squeeze(cov_EKF(3,3,2:end))), '--r', 'LineWidth', 2);
-plot(t(2:end), -3*sqrt(squeeze(cov_EKF(3,3,2:end))), '--r', 'LineWidth', 2);
+plot(t(2:end), 3*sqrt(squeeze(cov_EKF(3,3,2:end))), '--r', 'LineWidth', 1);
+plot(t(2:end), -3*sqrt(squeeze(cov_EKF(3,3,2:end))), '--r', 'LineWidth', 1);
 grid on;
-ylabel('\rho_N error [km]'); ylim([-1e-3 1e-3])
+ylabel('\rho_N error [km]'); %ylim([-1e-3 1e-3])
 
 ax4=subplot(4,1,4);
 plot(t, in_view(1,:), 'k*', t, in_view(2,:), 'r.');
